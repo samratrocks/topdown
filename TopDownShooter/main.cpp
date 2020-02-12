@@ -136,3 +136,12 @@ int render(sf::RenderWindow &window, Entity &player) {
     
     return 0;
 }
+
+// Next:
+// Let's roll out a projectile
+// Let's use a custom physics class for that
+// After the physics calculations are done, the scene is calculated
+// and it is sent to be drawn.
+
+// After that let's roll out a time engine!
+// Let's you manipulate time however you want.
