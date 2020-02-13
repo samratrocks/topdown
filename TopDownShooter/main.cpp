@@ -27,26 +27,28 @@
 // Entity class is our main game class.
 class Entity {
 public:
-    void setPosition(float x, float y);
-    void setSpeed(float x, float y);
-    void changePosition(float x, float y);
+    void setPosition(float, float);
+    void setSpeed(float, float);
+    void changePosition(float, float);
     sf::RectangleShape getSprite();
-    Entity();
+    Entity(float, float, sf::Color);
     
 
 private:
-    float xPosition = 10;
-    float yPosition = 10;
+    float xPosition;
+    float yPosition;
     float xSpeed;
     float ySpeed;
     sf::RectangleShape sprite;
 };
 
-Entity::Entity() {
+Entity::Entity(float x, float y, sf::Color color) {
     // Initialize the sprite
+    xPosition = x;
+    yPosition = y;
     sprite.setPosition(xPosition, yPosition);
     sprite.setSize(sf::Vector2f(60, 60));
-    sprite.setFillColor(sf::Color::White);
+    sprite.setFillColor(color);
 }
 
 void Entity::setPosition(float x, float y) {
@@ -75,7 +77,7 @@ class PhysicsManager {
 
 
 
-int render(sf::RenderWindow &window, Entity &player);
+int render(sf::RenderWindow &window, Entity &player, Entity &enemy);
 
 int main(int, char const**)
 {
@@ -88,16 +90,17 @@ int main(int, char const**)
         return EXIT_FAILURE;
     }
     
-    Entity player;
+    Entity player(100, 100, sf::Color::White);
+    Entity enemy(400, 400, sf::Color::Blue);
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-    if (render(window, player) == 0) {
+    if (render(window, player, enemy) == 0) {
         return EXIT_SUCCESS;
     }
     return 1;
 }
 
 
-int render(sf::RenderWindow &window, Entity &player) {
+int render(sf::RenderWindow &window, Entity &player, Entity &enemy) {
         // Start the game loop
         while (window.isOpen())
         {
@@ -109,25 +112,50 @@ int render(sf::RenderWindow &window, Entity &player) {
                 if (event.type == sf::Event::Closed) {
                     window.close();
                 }
+                
+                if (event.type == sf::Event::KeyPressed) {
+                    // Escape pressed: exit
+                    if(event.key.code == sf::Keyboard::Escape) {
+                        window.close();
+                    }
+                    
+                    // WASD: Move the player around
+                    if (event.key.code == sf::Keyboard::D) {
+                        player.changePosition(4, 0);
+                    }
+                    
+                    if (event.key.code == sf::Keyboard::A) {
+                        player.changePosition(-4, 0);
+                    }
+                    
+                    if (event.key.code == sf::Keyboard::S) {
+                        player.changePosition(0, 4);
+                    }
+                    
+                    if (event.key.code == sf::Keyboard::W) {
+                        player.changePosition(0, -4);
+                    }
+                    
+                    // Space: Shoot projectiles
+                    if (event.key.code == sf::Keyboard::Space) {
+                        // Let's shoot some projectiles
+                        std::cout << "Bang! Bang!\n";
+                    }
+                }
+                
+                // Let's check for collision
+                // If player.x is inside enemy.x + enemy.size.x
+                // or if player.y is inside enemy.y + enemy.size.y
+                // We know it's touching the enemy
+                //
 
-                // Escape pressed: exit
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-                    window.close();
-                }
-                
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::D) {
-                    player.changePosition(4, 0);
-                }
-                
-                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::A) {
-                    player.changePosition(-4, 0);
-                }
             }
 
             // Clear screen
             window.clear();
 
             // Draw to the window
+            window.draw(enemy.getSprite());
             window.draw(player.getSprite());
 
             // Update the window
